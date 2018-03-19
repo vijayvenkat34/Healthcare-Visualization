@@ -1,0 +1,24 @@
+{
+  "states": [
+    {
+      "name": "Maharashtra",
+      "districts": [
+      	"Ahmednagar","Akola","Amravati","Aurangabad","Bhandara","Bid","Buldana","Chandrapur","Dhule","Gadchiroli",
+      	"Gondiya","Hingoli","Jalgaon","Jalna",
+        "Pune"
+      ]
+    },
+    {
+    	"name": "Goa",
+    	"districts":[
+    		"North Goa","South Goa"
+    	]
+    },
+    {
+    	"name": "Daman and Diu",
+    	"districts":[
+    		"Daman","Diu"
+    	]
+    }	
+  ]
+}

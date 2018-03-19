@@ -8,6 +8,7 @@ require_once("process.php");
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/mycss.css">
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -24,9 +25,9 @@ require_once("process.php");
     </div>
     <ul class="nav navbar-nav">
       <li><a href="#">Overview</a></li>
-	  <li class="active"><a href="#">State wise</a></li>
-      <li><a href="districtwise.php?domain=<?php echo $domain?>">District wise</a></li>
-      <li><a href="#">Subdistrict wise</a></li>
+	  <li><a href="statewise.php?domain=<?php echo $domain?>">State wise</a></li>
+      <li class="active"><a href="districtwise.php?domain=<?php echo $domain?>">District wise</a></li>
+      <li><a href="subdistrictwise.php?domain=<?php echo $domain?>">Subdistrict wise</a></li>
     </ul>
   </div>
 </nav>
@@ -35,17 +36,41 @@ require_once("process.php");
 	<div class="col-md-2">
 	
 	<!--Fooooooooooooooooooooooooooooooooorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm--------------------------------------------------------------------------------------------->
-		<form action="statewise.php?domain=<?php echo $domain;?>" method="POST">  
-		
-		<h3>Select Year</h3> 
+		<form action="districtwise.php?domain=<?php echo $domain;?>" method="POST">  
+		<div class="panel panel-default">
+		<div class="panel-body">
+		<h4>Select Year</h4> 
 		<div class="form-group">
 		<select class="form-control" name="formYear">
 		<option>2016</option>
 		</select>
 		</div>
 		
+		<h4>Select State</h4> 
+		<div class="form-group">
+		<select class="form-control" name="formState">
+		<?php
+			$str = file_get_contents('content.json');
+			$json = json_decode($str, true);
+			
+			foreach($json['states'] as $s){
+				
+				if(isset($_POST['formState'])){
+					if($_POST['formState'] == $s['name']){
+						
+						echo "<option selected>".$s['name']."</option>";
+					}else{
+						echo "<option>".$s['name']."</option>";
+					}
+				}else{
+					echo "<option>".$s['name']."</option>";
+				}
+			}
+		?>
+		</select>
+		</div>
 		
-		<h3>Select Parameter</h3> 
+		<h4>Select Parameter</h4> 
 		<div class="form-group">
 		<select class="form-control" id="A" name="formParameter">
 		
@@ -71,21 +96,46 @@ require_once("process.php");
 		
 		<!--select type based on parameter in dropdown dynamically logic in script -- custom script ---->
 	
-		<h3>Select Type</h3> 
+		<h4>Select Type</h4> 
 		<div class="form-group">
 		<select class="form-control" id="B" name="formType">
 		</select>
 		</div>
 		<button type="submit" class="btn btn-default">Submit</button>
+		</div>
+		</div>
 		</form>
 	</div>
+	<div class="col-md-9">
 	<div class="row">
-		<div class="col-md-9">
-			<div id="chart_div2"></div>
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				
+				<div class="panel-body"><div id="chart_div"></div></div>
+			</div>
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-12"><div id="linechart"></div></div>
+
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				
+				<div class="panel-body"><div id="linechart"></div></div>
+		</div>
+		</div>
+	</div>
+	<div class="row">
+
+			<div class="col-md-6">
+					<div class="panel panel-default">
+				<div class="panel-body"><div id="chart_div1"></div></div>
+			</div>
+		</div>
+		<div class="col-md-6"><div id="chart_div2"></div></div>
+	</div>
+
+
+
 	</div>
 	</div>
   </body>
@@ -148,6 +198,7 @@ require_once("process.php");
 
 })();
 
+//save the type
 document.getElementById('B').options[<?php
 if(isset($_POST['formParameter']) && isset($_POST['formType'])){
 		mysql_select_db("frontend", $conn);
@@ -168,6 +219,10 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
 			
  ?>
  ].selected = true;
+ 
+//TODO save state,year,district,subdistrict
+
+ 
 	</script>
 	
 	
@@ -177,70 +232,96 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
       // Load the Visualization API and the corechart package.
       google.charts.load('current', {'packages':['corechart']});
 	  
-	   google.charts.load('current', {                                   ////changes here
-        'packages':['geochart'],
-        // Note: you will need to get a mapsApiKey for your project.
-        // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
-        'mapsApiKey': 'AIzaSyAjiMYuGyhxoFibQfPbe4VQLP2FN4Cw1WI'
-      });
 
       // Set a callback to run when the Google Visualization API is loaded.
+      google.charts.setOnLoadCallback(drawChart);
+      google.charts.setOnLoadCallback(drawChart2);
+	  google.charts.setOnLoadCallback(lineChart);
 
-	  google.charts.setOnLoadCallback(drawChart3); ///changes here
-	  //google.charts.setOnLoadCallback(lineChart);
-
-
-	  
-	    function drawChart3() {/////////////changes here
+      // Callback that creates and populates a data table,
+      // instantiates the chart, passes in the data and
+      // draws it.
+      function drawChart() {
 
         // Create the data table.
         var data = new google.visualization.DataTable();
-        data.addColumn('string', 'State');
+        data.addColumn('string', 'Districts');
         data.addColumn('number', 'Count');
-		
-		<?php
-		if(isset($_POST['formYear']) && isset($_POST['formParameter']) && isset($_POST['formType'])){
+
+        <?php
+		if(isset($_POST['formYear']) && isset($_POST['formState']) && isset($_POST['formParameter']) && isset($_POST['formType'])){
 			$year = $_POST['formYear'];
+			$state = $_POST['formState'];
 			$parameter = $_POST['formParameter'];
 			$type = $_POST['formType'];
 			
-			mysql_select_db("state", $conn);
-			$sql = "SELECT state,total from deaths_state where year='$year' and parameter='$parameter' and type = '$type';";
-			$result = mysql_query($sql);
+			//mysql_select_db("district", $conn);
+			//$sql = "select year,state,district,total from deaths_district where year='$year' and state='$state' and parameter='$parameter' and type='$type' order by total desc";
+			//$result = mysql_query($sql);
 			
 		}
 
         ?>
-		
 
         data.addRows([
           <?php
+			mysql_select_db("district", $conn);
+			$sql = "select district,total from deaths_district where year='$year' and state='$state' and parameter='$parameter' and type='$type' order by total desc";
+			$result = mysql_query($sql);
           while( $row = mysql_fetch_array($result,MYSQL_ASSOC) )
           {	
-            echo "['".$row['state']."', ".$row['total']."],";
+            echo "['".$row['district']."', ".$row['total']."],";
           }
          ?>
         ]);
 
         // Set chart options
-        var options = {'title':'<?php echo $_POST['formParameter']; ?>',
-			region: 'IN',
-		displayMode: 'regions',
-		resolution: 'provinces'
-         };
+        var options = {'title':'<?php echo 'Districts in '.$_POST['formState'].' ('.$_POST['formParameter'].') ('.$_POST['formType'].')'; ?>',
+                        'is3D':true,};
 
         // Instantiate and draw our chart, passing in some options.
-        var chart3 = new google.visualization.GeoChart(document.getElementById('chart_div2'));
-        chart3.draw(data, options);
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+
+      function drawChart2() {
+
+			// Create the data table.
+			var data = new google.visualization.DataTable();
+			data.addColumn('string', 'Districts');
+			data.addColumn('number', 'Count');
+
+			<?php
+			mysql_select_db("district", $conn);
+			$sql = "select district,total from deaths_district where year='$year' and state='$state' and parameter='$parameter' and type='$type' order by total desc";
+			$result = mysql_query($sql);
+			?>
+
+			data.addRows([
+			  <?php
+			  while( $row = mysql_fetch_array($result,MYSQL_ASSOC) )
+			  {	
+				echo "['".$row['district']."', ".$row['total']."],";
+			  }
+			 ?>
+			]);
+
+			// Set chart options
+			var options = {'title':'<?php echo $_POST['formParameter']; ?>'
+			 };
+
+			// Instantiate and draw our chart, passing in some options.
+			var chart2 = new google.visualization.PieChart(document.getElementById('chart_div1'));
+			chart2.draw(data, options);
       }
 	  
-/* 	  	    function lineChart() {
+	    function lineChart() {
 
 
 			<?php
 			mysql_select_db("state", $conn);
 			mysql_query("drop view if exists temp");
-			$sql = "CREATE VIEW temp as select year,type,total from deaths_state where parameter='$parameter' order by year asc";
+			$sql = "CREATE VIEW temp as select year,type,total from deaths_state where state='$state' and parameter='$parameter' order by year asc";
 			
 			$result_view = mysql_query($sql);
 			
@@ -301,13 +382,14 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
 			]);
 
 			// Set chart options
-			var options = {'title':'<?php echo $_POST['formParameter'].' in India'?>'
+			var options = {'title':'<?php echo $_POST['formParameter'].' in '.$_POST['formState']; ?>'
 			 };
 
 			// Instantiate and draw our chart, passing in some options.
 			var chart3 = new google.visualization.LineChart(document.getElementById('linechart'));
 			chart3.draw(data, options);
-      } */
+      }
+	  
 
 
     </script>

@@ -14,6 +14,7 @@
 <li><a href="tableau/childdiseases.php">Childhood Diseases</a></li>
 <li><a href="tableau/deaths.php">Deaths</a></li>
 <li><a href="tableau/childimmuization.php">Child Immunization</a></li>
+<li><a href="download.php">Download Datasets</a></li>
 </ul
 </div>
 </body>
