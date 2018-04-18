@@ -8,6 +8,7 @@ require_once("process.php");
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/mycss.css">
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -17,13 +18,13 @@ require_once("process.php");
   </head>
 
   <body>
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand" href="index.php">Healthcare</a>
     </div>
     <ul class="nav navbar-nav">
-      <li><a href="#">Overview</a></li>
+      <li><a href="tableau/<?php echo $domain?>.php">Overview</a></li>
 	  <li class="active"><a href="#">State wise</a></li>
       <li><a href="districtwise.php?domain=<?php echo $domain?>">District wise</a></li>
       <li><a href="#">Subdistrict wise</a></li>
@@ -34,13 +35,36 @@ require_once("process.php");
 	<div class="row">
 	<div class="col-md-2">
 	
+	<div class="panel panel-primary">
+	
+	<div class="panel-body">
 	<!--Fooooooooooooooooooooooooooooooooorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm--------------------------------------------------------------------------------------------->
 		<form action="statewise.php?domain=<?php echo $domain;?>" method="POST">  
 		
 		<h3>Select Year</h3> 
 		<div class="form-group">
 		<select class="form-control" name="formYear">
-		<option>2016</option>
+			<?php
+			$yearArray = ['2016','2015','2014','2013','2012','2011','2010'];
+			if(isset($_POST['formYear'])){
+				
+				foreach($yearArray as $y){
+					if($_POST['formYear'] == $y){
+						echo "<option selected>".$y."</option>";
+					}else{
+						echo "<option>".$y."</option>";
+					}
+				}
+			}else{
+				echo "<option selected>2016</option>
+						<option>2015</option>
+						<option>2014</option>
+						<option>2013</option>
+						<option>2012</option>
+						<option>2011</option><
+						option>2010</option>";
+			}
+			?>
 		</select>
 		</div>
 		
@@ -79,14 +103,18 @@ require_once("process.php");
 		<button type="submit" class="btn btn-default">Submit</button>
 		</form>
 	</div>
-	<div class="row">
-		<div class="col-md-9">
+	</div>
+	</div>
+
+		<div class="col-md-10">
+		<div class="panel panel-primary">
+		<div class="panel-heading"><h4><?php if(isset($_POST['formParameter'])) echo $_POST['formParameter']." (".$_POST['formType'].")";?></h4></div>
+		<div class="panel-body">
 			<div id="chart_div2"></div>
 		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-12"><div id="linechart"></div></div>
-	</div>
+		</div>
+		</div>
+		</div>
 	</div>
   </body>
 
@@ -205,7 +233,11 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
 			$type = $_POST['formType'];
 			
 			mysql_select_db("state", $conn);
-			$sql = "SELECT state,total from deaths_state where year='$year' and parameter='$parameter' and type = '$type';";
+			
+			$domain_state = $domain.'_state';
+			
+			$sql = "SELECT state,total from $domain_state where year='$year' and parameter='$parameter' and type = '$type'";
+			
 			$result = mysql_query($sql);
 			
 		}
@@ -216,9 +248,20 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
         data.addRows([
           <?php
           while( $row = mysql_fetch_array($result,MYSQL_ASSOC) )
-          {	
+          {
+			  //remove this if updated
+			if($row['state'] == "uttar-pradesh" || $row['state'] == "himachal-pradesh"){
+				if($row['state'] == 'uttar-pradesh'){
+					$row['state'] = 'Uttar Pradesh';
+				}
+				else if($row['state'] == 'himachal-pradesh'){
+					$row['state'] = 'Himachal Pradesh';
+				}
+			}
             echo "['".$row['state']."', ".$row['total']."],";
+			
           }
+		  
          ?>
         ]);
 
@@ -226,7 +269,8 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
         var options = {'title':'<?php echo $_POST['formParameter']; ?>',
 			region: 'IN',
 		displayMode: 'regions',
-		resolution: 'provinces'
+		resolution: 'provinces',
+		width: 1150
          };
 
         // Instantiate and draw our chart, passing in some options.
@@ -234,13 +278,13 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
         chart3.draw(data, options);
       }
 	  
-/* 	  	    function lineChart() {
+  	    /*function lineChart() {
 
 
 			<?php
 			mysql_select_db("state", $conn);
 			mysql_query("drop view if exists temp");
-			$sql = "CREATE VIEW temp as select year,type,total from deaths_state where parameter='$parameter' order by year asc";
+			$sql = "CREATE VIEW temp as select year,type,total from ".$domain."_state where parameter='$parameter' order by year asc";
 			
 			$result_view = mysql_query($sql);
 			

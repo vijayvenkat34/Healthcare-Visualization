@@ -8,7 +8,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand" href="index.php"><span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp Back</a>
@@ -17,7 +17,7 @@
 </nav>	
 	
 <div class="container">
-  <div class="panel panel-default">
+  <div class="panel panel-primary">
     <div class="panel-heading"><h2>Health performance datasets</h2><br>Last updated 15th March 2018</div>
 	</div>
 			<div class="row">

@@ -10,22 +10,33 @@
 
 <body>
 
-<nav class="navbar navbar-inverse navbar-fixed-top">
+<nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand" href="../index.php">Healthcare</a>
     </div>
     <ul class="nav navbar-nav">
       <li class="active"><a href="#">Overview</a></li>
-	  <li><a href="../statewise.php?domain=childimmune">State wise</a></li>
-      <li><a href="../districtwise.php?domain=childimmune">District wise</a></li>
-      <li><a href="../subdistrictwise.php?domain=childimmune">Subdistrict wise</a></li>
+	  <li><a href="../statewise.php?domain=pregencies">State wise</a></li>
+      <li><a href="../districtwise.php?domain=pregencies">District wise</a></li>
+      <li><a href="../subdistrictwise.php?domain=pregencies">Subdistrict wise</a></li>
     </ul>
   </div>
 </nav>
 
-<div class="container">
+<div class="container-fluid">
+<div class="row" >
 
+
+  <div class="col-md-12">
+  <div class="panel panel-primary">
+  <div class="panel-body">
+
+  </div>
+  </div>
+  </div>
+
+</div>
 </div>
 
 </body>

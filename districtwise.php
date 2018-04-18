@@ -18,13 +18,13 @@ require_once("process.php");
   </head>
 
   <body>
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand" href="index.php">Healthcare</a>
     </div>
     <ul class="nav navbar-nav">
-      <li><a href="#">Overview</a></li>
+      <li><a href="tableau/<?php echo $domain; ?>.php">Overview</a></li>
 	  <li><a href="statewise.php?domain=<?php echo $domain?>">State wise</a></li>
       <li class="active"><a href="districtwise.php?domain=<?php echo $domain?>">District wise</a></li>
       <li><a href="subdistrictwise.php?domain=<?php echo $domain?>">Subdistrict wise</a></li>
@@ -33,16 +33,37 @@ require_once("process.php");
 </nav>
 	<div class="container-fluid">
 	<div class="row">
-	<div class="col-md-2">
+	<div class="col-md-2" id="form">
 	
 	<!--Fooooooooooooooooooooooooooooooooorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm--------------------------------------------------------------------------------------------->
 		<form action="districtwise.php?domain=<?php echo $domain;?>" method="POST">  
-		<div class="panel panel-default">
-		<div class="panel-body">
+		<div class="panel panel-primary">
+		<div class="panel-heading"><h3>Options</h3></div>
+		<div class="panel-body" id="form">
 		<h4>Select Year</h4> 
 		<div class="form-group">
 		<select class="form-control" name="formYear">
-		<option>2016</option>
+			<?php
+			$yearArray = ['2016','2015','2014','2013','2012','2011','2010'];
+			if(isset($_POST['formYear'])){
+				
+				foreach($yearArray as $y){
+					if($_POST['formYear'] == $y){
+						echo "<option selected>".$y."</option>";
+					}else{
+						echo "<option>".$y."</option>";
+					}
+				}
+			}else{
+				echo "<option selected>2016</option>
+						<option>2015</option>
+						<option>2014</option>
+						<option>2013</option>
+						<option>2012</option>
+						<option>2011</option><
+						option>2010</option>";
+			}
+			?>
 		</select>
 		</div>
 		
@@ -109,7 +130,7 @@ require_once("process.php");
 	<div class="col-md-9">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="panel panel-default">
+			<div class="panel panel-primary">
 				
 				<div class="panel-body"><div id="chart_div"></div></div>
 			</div>
@@ -118,7 +139,7 @@ require_once("process.php");
 	<div class="row">
 
 		<div class="col-md-12">
-			<div class="panel panel-default">
+			<div class="panel panel-primary">
 				
 				<div class="panel-body"><div id="linechart"></div></div>
 		</div>
@@ -127,15 +148,48 @@ require_once("process.php");
 	<div class="row">
 
 			<div class="col-md-6">
-					<div class="panel panel-default">
+					<div class="panel panel-primary">
 				<div class="panel-body"><div id="chart_div1"></div></div>
 			</div>
 		</div>
-		<div class="col-md-6"><div id="chart_div2"></div></div>
+			<div class="col-md-6">
+				<div class="panel panel-primary">
+				<div class="panel-heading"><h3>Top Parameter in 
+				<?php 
+					if(isset($_POST['formState']) && isset($_POST['formYear'])) {
+						echo $_POST['formState'].' in '.$_POST['formYear'];
+					}
+				?>
+				</h3></div>
+				<div class="panel-body">
+				
+				<?php
+				if(isset($_POST['formYear'])){
+					
+					$year = $_POST['formYear'];
+					$state = $_POST['formState'];
+					
+					mysql_select_db("district", $conn);
+					
+					$sql = "select parameter,type,max(total) as total from ".$domain."_district where year=$year and state='$state'";
+				
+					$result = mysql_query($sql);
+					while($row = mysql_fetch_array($result,MYSQL_ASSOC)){
+						echo '<h4>'.$row['parameter'].'</h4>';
+						echo '<h4>Range - '.$row['type'].'</h4>';
+						echo '<h4>Value - '.$row['total'].'</h4>';
+					}
+				}	
+				?>
+				</div>
+			</div>
+		</div>
+		
 	</div>
 
 
 
+	</div>
 	</div>
 	</div>
   </body>
@@ -266,7 +320,7 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
         data.addRows([
           <?php
 			mysql_select_db("district", $conn);
-			$sql = "select district,total from deaths_district where year='$year' and state='$state' and parameter='$parameter' and type='$type' order by total desc";
+			$sql = "select district,total from ".$domain."_district where year='$year' and state='$state' and parameter='$parameter' and type='$type' order by total desc limit 15";
 			$result = mysql_query($sql);
           while( $row = mysql_fetch_array($result,MYSQL_ASSOC) )
           {	
@@ -293,7 +347,7 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
 
 			<?php
 			mysql_select_db("district", $conn);
-			$sql = "select district,total from deaths_district where year='$year' and state='$state' and parameter='$parameter' and type='$type' order by total desc";
+			$sql = "select district,total from ".$domain."_district where year='$year' and state='$state' and parameter='$parameter' and type='$type' order by total desc limit 10";
 			$result = mysql_query($sql);
 			?>
 
@@ -321,7 +375,7 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
 			<?php
 			mysql_select_db("state", $conn);
 			mysql_query("drop view if exists temp");
-			$sql = "CREATE VIEW temp as select year,type,total from deaths_state where state='$state' and parameter='$parameter' order by year asc";
+			$sql = "CREATE VIEW temp as select year,type,total from ".$domain."_state where state='$state' and parameter='$parameter' order by year asc";
 			
 			$result_view = mysql_query($sql);
 			
@@ -382,7 +436,8 @@ if(isset($_POST['formParameter']) && isset($_POST['formType'])){
 			]);
 
 			// Set chart options
-			var options = {'title':'<?php echo $_POST['formParameter'].' in '.$_POST['formState']; ?>'
+			var options = {'title':'<?php echo 'Trend of '.$_POST['formParameter'].' in '.$_POST['formState']; ?>',
+				curveType: 'function'
 			 };
 
 			// Instantiate and draw our chart, passing in some options.
