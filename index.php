@@ -47,7 +47,7 @@
 <a href="tableau/childdiseases.php" class="button">CHILDHOOD DISEASES</a>&nbsp&nbsp</p>
 
 <p>&nbsp&nbsp<a href="tableau/labtest.php" class="button">LAB TESTING</a>&nbsp&nbsp&nbsp&nbsp
-<a href="tableau/childimmuization.php" class="button">CHILD IMMUNIZATION</a>&nbsp&nbsp</p>
+<a href="tableau/childimmune.php" class="button">CHILD IMMUNIZATION</a>&nbsp&nbsp</p>
 
 <p>&nbsp&nbsp<a href="tableau/pregencies.php" class="button">CHILD BIRTHS</a>&nbsp&nbsp&nbsp&nbsp
 <a href="tableau/familyplanning.php" class="button">FAMILY PLANNING</a>&nbsp&nbsp</p>

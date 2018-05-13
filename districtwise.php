@@ -169,15 +169,18 @@ require_once("process.php");
 					$year = $_POST['formYear'];
 					$state = $_POST['formState'];
 					
-					mysql_select_db("district", $conn);
+					mysql_select_db("state", $conn);
 					
-					$sql = "select parameter,type,max(total) as total from ".$domain."_district where year=$year and state='$state'";
+					$sql = "select parameter,type,total from ".$domain."_state where year=$year and state='$state' order by total desc";
 				
 					$result = mysql_query($sql);
 					while($row = mysql_fetch_array($result,MYSQL_ASSOC)){
 						echo '<h4>'.$row['parameter'].'</h4>';
-						echo '<h4>Range - '.$row['type'].'</h4>';
-						echo '<h4>Value - '.$row['total'].'</h4>';
+						//echo '<h4>Range - '.$row['type'].'</h4>';
+						
+						echo '<h4>Value - '.number_format($row['total']).'</h4>';
+						
+						break;
 					}
 				}	
 				?>
@@ -206,15 +209,15 @@ require_once("process.php");
 	  <?php
 	  /////modify this part with array
 	  		mysql_select_db("frontend", $conn);
-			$sql = "select distinct(parameter) from $domain";
-			$result = mysql_query($sql);
+			//$sql = "select distinct(parameter) from $domain";
+			//$result = mysql_query($sql);
 			
-			while($row = mysql_fetch_array($result,MYSQL_ASSOC)){
+			foreach($parameterArray as $i){
 				
-				$sql = "select type from $domain where parameter='{$row['parameter']}'";
+				$sql = "select type from $domain where parameter='{$i}'";
 				$sub_result = mysql_query($sql);
 				
-				$parameter = $row['parameter'];
+				$parameter = $i;
 				echo "\"$parameter\":[";
 					while($sub_row = mysql_fetch_array($sub_result,MYSQL_ASSOC)){
 						

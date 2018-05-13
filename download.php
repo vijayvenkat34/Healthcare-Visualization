@@ -25,8 +25,10 @@
 			<ul class="list-group">
 			<li class="list-group-item disabled"><b>Total Size : 42MB</b></li>
 			  <li class="list-group-item"><a href="download.php?domain=deaths"><span class="glyphicon glyphicon-file" aria-hidden="true"></span><b>Deaths</b></a></li>
-			  <li class="list-group-item"><a href="download.php?domain=deaths"><span class="glyphicon glyphicon-file" aria-hidden="true"></span><b>Child Diseases</b></a></li>
-			  <li class="list-group-item"><a href="download.php?domain=deaths"><span class="glyphicon glyphicon-file" aria-hidden="true"></span><b>Child Immunization</b></a></li>
+			  <li class="list-group-item"><a href="download.php?domain=childdiseases"><span class="glyphicon glyphicon-file" aria-hidden="true"></span><b>Child Diseases</b></a></li>
+			  <li class="list-group-item"><a href="download.php?domain=childimmune"><span class="glyphicon glyphicon-file" aria-hidden="true"></span><b>Child Immunization</b></a></li>
+			  <li class="list-group-item"><a href="download.php?domain=pregencies"><span class="glyphicon glyphicon-file" aria-hidden="true"></span><b>Child Births</b></a></li>
+			  <li class="list-group-item"><a href="download.php?domain=familyplanning"><span class="glyphicon glyphicon-file" aria-hidden="true"></span><b>Family Planning</b></a></li>
 			</ul>
 			
 			</div>
@@ -34,7 +36,7 @@
 					<div>
 						<?php
 							if(isset($_GET['domain'])){
-								echo '<h2>'.$_GET['domain'].'.csv &nbsp<a href="datasets/ChildDiseases-2016.csv" download><button type="submit" class="btn btn-primary">Download</button></a>';
+								echo '<h2>'.$_GET['domain'].'.csv &nbsp<a href="datasets/'.$_GET['domain'].'_state" download><button type="submit" class="btn btn-primary">Download</button></a>';
 								
 							}
 						?>
@@ -44,8 +46,8 @@
 					<?php
 					//TODO get actual datasets from hadoop
 						if(isset($_GET['domain'])){
-							//$file = fopen("datasets/".$_GET['domain'].".csv","r");
-							$file = fopen("datasets/ChildDiseases-2016.csv","r");
+							$file = fopen("datasets/".$_GET['domain']."_state","r");
+							//$file = fopen("datasets/ChildDiseases-2016.csv","r");
 
 							echo '  <table class="table table-bordered" id="mytable">
 									<thead>
@@ -70,8 +72,8 @@
 												<td>'.$data[2].'</td>
 												<td>'.$data[3].'</td>
 												<td>'.$data[4].'</td>
-												<td>'.$data[5].'</td>
-												<td>'.$data[6].'</td>
+												<td>'.$data[4].'</td>
+												<td>'.$data[4].'</td>
 											</tr>';
 										$i++;
 									}
